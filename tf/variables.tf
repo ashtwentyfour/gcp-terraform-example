@@ -14,5 +14,9 @@ variable "environment" {
 }
 
 variable "project" {
-  type    = string
+  type = string
+}
+
+variable "service_account" {
+  type = string
 }

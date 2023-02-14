@@ -11,6 +11,6 @@ resource "google_artifact_registry_repository_iam_binding" "binding" {
   repository = google_artifact_registry_repository.repository.name
   role       = "roles/artifactregistry.reader"
   members = [
-    "serviceAccount:sa-artifact-repo-reader@pluralsight-gcp-infrastructure.iam.gserviceaccount.com"
+    "serviceAccount:${var.service_account}@${var.project}.iam.gserviceaccount.com"
   ]
 }
