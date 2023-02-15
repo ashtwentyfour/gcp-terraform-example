@@ -1,10 +1,44 @@
-workflow:
-  rules:
-    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
-    - if: $CI_COMMIT_BRANCH && $CI_OPEN_MERGE_REQUESTS
-      when: never
-    - if: $CI_COMMIT_BRANCH
-    - if: $CREATE_BACKEND == "yes" || $PROVISION_INFRA == "yes"
+image:
+   name: hashicorp/terraform:light
+   entrypoint:
+     - '/usr/bin/env'
+     - 'PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin'
 
-default:
-  image: hashicorp/terraform
+stages:
+  - tf-init
+  - tf-validate
+  - tf-plan
+  - tf-apply
+
+cache: &global_cache
+  key: $CI_COMMIT_REF_SLUG
+  paths:
+    - ./tf/gcp
+    - ./tf/.terraform
+    - ./tf/.terraform.lock.hcl
+    - ./tf/tf-plan
+  policy: pull-push
+
+tf-init:
+  stage: tf-init
+  script:
+    - rm -rf ./tf/.terraform
+    - mkdir -p ./tf/gcp
+    - echo $GOOGLE_CREDENTIALS_B64 | base64 -d > ./tf/gcp/key-file.json
+    - cd ./tf && terraform init
+
+tf-plan:
+  stage: tf-plan
+  dependencies:
+    - tf-init
+  script:
+    - ls -ltr ./tf
+    - cd ./tf && terraform validate && terraform plan -out "tf-plan"
+
+tf-apply:
+  stage: tf-apply
+  dependencies:
+    - tf-plan
+  script:
+    - cd ./tf && terraform apply -input=false "tf-plan"
+  when: manual
