@@ -5,3 +5,4 @@
 * Update the ensure a bucket has been provisioned and that the bucket name/ID has been updated in the ```tf/backend.tf``` file
 * Ensure that the service account being used to provision the resources has the right permissions to access the bucket as described [here](https://gitlab.com/gitlab-org/gitlab-orchestrator/-/blob/18b59d594acea557c66cb17bb951c2b1c65105eb/doc/quickstart.md#software-requirements)
 * The contents of the JSON key-file for the service account should be base64 encrypted and the encrypted string must be added to the pipeline variables as ```GOOGLE_CREDENTIALS_B64```
+* The service account referenced by the ```tf\terraform.tfvars``` will be granted reader permissions on the newly created repository
